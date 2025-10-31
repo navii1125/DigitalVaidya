@@ -8,9 +8,39 @@ export default function EmailLogin({ onBack, onDone }) {
   const [loading, setLoading] = React.useState(false);
   const { login, signUp } = useAuth();
 
+  const validateForm = () => {
+    if (!email.trim()) {
+      setError('Please enter your email address');
+      return false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
+      return false;
+    }
+
+    if (!password) {
+      setError('Please enter a password');
+      return false;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return false;
+    }
+
+    return true;
+  };
+
   const submitLogin = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (!validateForm()) {
+      return;
+    }
+    
     setLoading(true);
     
     try {
@@ -27,6 +57,11 @@ export default function EmailLogin({ onBack, onDone }) {
   const submitCreate = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (!validateForm()) {
+      return;
+    }
+    
     setLoading(true);
     
     try {
@@ -53,8 +88,10 @@ export default function EmailLogin({ onBack, onDone }) {
           type="email" 
           value={email} 
           onChange={(e) => setEmail(e.target.value)} 
+          placeholder="you@example.com"
           className="mt-1 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 p-3"
           disabled={loading}
+          required
         />
       </div>
       <div>
@@ -63,8 +100,11 @@ export default function EmailLogin({ onBack, onDone }) {
           type="password" 
           value={password} 
           onChange={(e) => setPassword(e.target.value)} 
+          placeholder="At least 6 characters"
           className="mt-1 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 p-3"
           disabled={loading}
+          required
+          minLength={6}
         />
       </div>
       <div className="flex items-center justify-between gap-3 flex-wrap">
