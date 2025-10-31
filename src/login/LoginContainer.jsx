@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../context/AuthContext.jsx';
 import LanguageSelect from './LanguageSelect.jsx';
 import LoginOptions from './LoginOptions.jsx';
 import EmailLogin from './EmailLogin.jsx';
@@ -17,10 +18,17 @@ const steps = [
 ];
 
 export default function LoginContainer({ onComplete }) {
+  const { isAuthenticated, user } = useAuth();
   const [step, setStep] = React.useState(0); // index in steps
   const [method, setMethod] = React.useState(null); // 'email' | 'aadhaar' | 'face'
   const [language, setLanguage] = React.useState('en');
   const [userName, setUserName] = React.useState('');
+
+  React.useEffect(() => {
+    if (isAuthenticated && user && onComplete) {
+      onComplete();
+    }
+  }, [isAuthenticated, user, onComplete]);
 
   const next = () => setStep((s) => Math.min(s + 1, steps.length - 1));
   const back = () => setStep((s) => Math.max(0, s - 1));

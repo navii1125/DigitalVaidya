@@ -133,95 +133,111 @@ export default function Demo() {
           viewport={{ once: true }}
           className="glass rounded-2xl p-4 sm:p-6"
         >
-          <h3 className="font-semibold mb-4">Health Parameters</h3>
-          <div className="grid sm:grid-cols-2 gap-4">
+          <h3 className="font-semibold">Sketch Area</h3>
+          <div className="mt-3 aspect-[4/3] rounded-xl border border-white/40 dark:border-white/10 bg-white dark:bg-slate-900 grid place-items-center">
+            <div className="text-center opacity-70">
+              <div className="text-5xl">✏️</div>
+              <p className="mt-2 text-sm">Tap or click to mark the area that hurts</p>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05, duration: 0.5 }}
+          viewport={{ once: true }}
+          className="glass rounded-2xl p-4 sm:p-6"
+        >
+          <h3 className="font-semibold mb-3">Health Parameters</h3>
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-sm opacity-80">Body Temperature (°C)</label>
+              <label className="text-xs opacity-80">Temperature (°C)</label>
               <input 
                 type="number" 
                 step="0.1"
                 placeholder="37.0"
                 value={healthParams.temperature}
                 onChange={(e) => updateHealthParam('temperature', e.target.value)}
-                className="mt-1 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 p-3"
+                className="mt-1 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 p-2 text-sm"
               />
             </div>
             
             <div>
-              <label className="text-sm opacity-80">Heart Rate (bpm)</label>
+              <label className="text-xs opacity-80">Heart Rate (bpm)</label>
               <input 
                 type="number"
                 placeholder="75"
                 value={healthParams.heartRate}
                 onChange={(e) => updateHealthParam('heartRate', e.target.value)}
-                className="mt-1 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 p-3"
+                className="mt-1 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 p-2 text-sm"
               />
             </div>
             
             <div>
-              <label className="text-sm opacity-80">Blood Pressure (Systolic)</label>
+              <label className="text-xs opacity-80">BP Systolic</label>
               <input 
                 type="number"
                 placeholder="120"
                 value={healthParams.systolicBP}
                 onChange={(e) => updateHealthParam('systolicBP', e.target.value)}
-                className="mt-1 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 p-3"
+                className="mt-1 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 p-2 text-sm"
               />
             </div>
             
             <div>
-              <label className="text-sm opacity-80">Blood Pressure (Diastolic)</label>
+              <label className="text-xs opacity-80">BP Diastolic</label>
               <input 
                 type="number"
                 placeholder="80"
                 value={healthParams.diastolicBP}
                 onChange={(e) => updateHealthParam('diastolicBP', e.target.value)}
-                className="mt-1 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 p-3"
+                className="mt-1 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 p-2 text-sm"
               />
             </div>
             
-            <div className="sm:col-span-2">
-              <label className="text-sm opacity-80">Oxygen Saturation (%)</label>
+            <div className="col-span-2">
+              <label className="text-xs opacity-80">Oxygen Saturation (%)</label>
               <input 
                 type="number"
                 placeholder="98"
                 value={healthParams.oxygenLevel}
                 onChange={(e) => updateHealthParam('oxygenLevel', e.target.value)}
-                className="mt-1 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 p-3"
+                className="mt-1 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 p-2 text-sm"
               />
             </div>
           </div>
         </motion.div>
-
-        <motion.form
-          onSubmit={analyze}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.5 }}
-          viewport={{ once: true }}
-          className="glass rounded-2xl p-4 sm:p-6 flex flex-col"
-        >
-          <h3 className="font-semibold">Describe Your Symptoms</h3>
-          <textarea
-            className="mt-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 p-3 outline-none focus:ring-2 focus:ring-brand-400 min-h-[150px]"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-          <div className="mt-4 flex items-center gap-3 flex-wrap">
-            <button type="button" onClick={toggleListening} className={`inline-flex items-center gap-2 rounded-xl px-4 py-3 ${listening ? 'bg-red-500 text-white' : 'bg-emerald-600 text-white'} shadow-lg hover:opacity-95 transition`}>
-              <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
-                <path d="M12 14a4 4 0 0 0 4-4V7a4 4 0 1 0-8 0v3a4 4 0 0 0 4 4Z" stroke="currentColor" strokeWidth="2"/>
-                <path d="M19 11a7 7 0 0 1-14 0m7 7v3" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-              {listening ? 'Listening… Click to stop' : 'Speak Symptoms'}
-            </button>
-            {!supported && <span className="text-sm opacity-70">Voice input not supported in this browser.</span>}
-            <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? 'Analyzing...' : 'Analyze'}
-            </button>
-          </div>
-        </motion.form>
       </div>
+
+      <motion.form
+        onSubmit={analyze}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.5 }}
+        viewport={{ once: true }}
+        className="mt-6 glass rounded-2xl p-4 sm:p-6"
+      >
+        <h3 className="font-semibold">Describe Your Symptoms</h3>
+        <textarea
+          className="mt-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 p-3 outline-none focus:ring-2 focus:ring-brand-400 min-h-[120px]"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+        <div className="mt-4 flex items-center gap-3 flex-wrap">
+          <button type="button" onClick={toggleListening} className={`inline-flex items-center gap-2 rounded-xl px-4 py-3 ${listening ? 'bg-red-500 text-white' : 'bg-emerald-600 text-white'} shadow-lg hover:opacity-95 transition`}>
+            <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+              <path d="M12 14a4 4 0 0 0 4-4V7a4 4 0 1 0-8 0v3a4 4 0 0 0 4 4Z" stroke="currentColor" strokeWidth="2"/>
+              <path d="M19 11a7 7 0 0 1-14 0m7 7v3" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+            {listening ? 'Listening… Click to stop' : 'Speak Symptoms'}
+          </button>
+          {!supported && <span className="text-sm opacity-70">Voice input not supported in this browser.</span>}
+          <button type="submit" className="btn-primary" disabled={loading}>
+            {loading ? 'Analyzing...' : 'Analyze'}
+          </button>
+        </div>
+      </motion.form>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
