@@ -1,12 +1,23 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
+import { auth } from '../config/firebase';
 
 export default function Demo() {
   const [description, setDescription] = React.useState('Sharp pain on the lower right abdomen for 3 hours.');
+  const [healthParams, setHealthParams] = React.useState({
+    temperature: '',
+    systolicBP: '',
+    diastolicBP: '',
+    heartRate: '',
+    oxygenLevel: ''
+  });
   const [result, setResult] = React.useState(null);
   const [listening, setListening] = React.useState(false);
   const [supported, setSupported] = React.useState(true);
+  const [loading, setLoading] = React.useState(false);
   const recognitionRef = React.useRef(null);
+  const { user } = useAuth();
 
   React.useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -56,19 +67,62 @@ export default function Demo() {
     }
   };
 
-  const analyze = (e) => {
+  const analyze = async (e) => {
     e.preventDefault();
-    setResult({
-      condition: 'Possible Appendicitis',
-      urgency: 'Seek medical attention within 24 hours',
-    });
+    setLoading(true);
+    
+    try {
+      const token = user ? await auth.currentUser?.getIdToken() : null;
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          description,
+          healthParams
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.ok && data.result) {
+        setResult(data.result);
+      } else {
+        setResult({
+          condition: 'Unable to analyze',
+          urgency: 'Please try again',
+        });
+      }
+    } catch (error) {
+      console.error('Analysis error:', error);
+      setResult({
+        condition: 'Error during analysis',
+        urgency: 'Please try again',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateHealthParam = (key, value) => {
+    setHealthParams(prev => ({
+      ...prev,
+      [key]: value
+    }));
   };
 
   return (
     <div>
       <div className="text-center">
         <h2 className="text-3xl font-bold">Live Demo</h2>
-        <p className="mt-3 text-slate-600 dark:text-slate-300">Sketch + describe your symptoms to get quick insights.</p>
+        <p className="mt-3 text-slate-600 dark:text-slate-300">Enter your symptoms and health parameters for AI analysis.</p>
       </div>
 
       <div className="mt-10 grid lg:grid-cols-2 gap-6">
@@ -79,11 +133,62 @@ export default function Demo() {
           viewport={{ once: true }}
           className="glass rounded-2xl p-4 sm:p-6"
         >
-          <h3 className="font-semibold">Sketch Area</h3>
-          <div className="mt-3 aspect-[4/3] rounded-xl border border-white/40 dark:border-white/10 bg-white dark:bg-slate-900 grid place-items-center">
-            <div className="text-center opacity-70">
-              <div className="text-5xl">✏️</div>
-              <p className="mt-2 text-sm">Placeholder canvas for body sketch</p>
+          <h3 className="font-semibold mb-4">Health Parameters</h3>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm opacity-80">Body Temperature (°C)</label>
+              <input 
+                type="number" 
+                step="0.1"
+                placeholder="37.0"
+                value={healthParams.temperature}
+                onChange={(e) => updateHealthParam('temperature', e.target.value)}
+                className="mt-1 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 p-3"
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm opacity-80">Heart Rate (bpm)</label>
+              <input 
+                type="number"
+                placeholder="75"
+                value={healthParams.heartRate}
+                onChange={(e) => updateHealthParam('heartRate', e.target.value)}
+                className="mt-1 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 p-3"
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm opacity-80">Blood Pressure (Systolic)</label>
+              <input 
+                type="number"
+                placeholder="120"
+                value={healthParams.systolicBP}
+                onChange={(e) => updateHealthParam('systolicBP', e.target.value)}
+                className="mt-1 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 p-3"
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm opacity-80">Blood Pressure (Diastolic)</label>
+              <input 
+                type="number"
+                placeholder="80"
+                value={healthParams.diastolicBP}
+                onChange={(e) => updateHealthParam('diastolicBP', e.target.value)}
+                className="mt-1 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 p-3"
+              />
+            </div>
+            
+            <div className="sm:col-span-2">
+              <label className="text-sm opacity-80">Oxygen Saturation (%)</label>
+              <input 
+                type="number"
+                placeholder="98"
+                value={healthParams.oxygenLevel}
+                onChange={(e) => updateHealthParam('oxygenLevel', e.target.value)}
+                className="mt-1 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 p-3"
+              />
             </div>
           </div>
         </motion.div>
@@ -111,7 +216,9 @@ export default function Demo() {
               {listening ? 'Listening… Click to stop' : 'Speak Symptoms'}
             </button>
             {!supported && <span className="text-sm opacity-70">Voice input not supported in this browser.</span>}
-            <button type="submit" className="btn-primary">Analyze</button>
+            <button type="submit" className="btn-primary" disabled={loading}>
+              {loading ? 'Analyzing...' : 'Analyze'}
+            </button>
           </div>
         </motion.form>
       </div>
@@ -123,24 +230,30 @@ export default function Demo() {
         viewport={{ once: true }}
         className="mt-6 glass rounded-2xl p-4 sm:p-6"
       >
-        <h3 className="font-semibold">Mock Results</h3>
+        <h3 className="font-semibold">Analysis Results</h3>
         {result ? (
-          <div className="mt-3 grid sm:grid-cols-2 gap-4">
-            <div className="rounded-xl border border-emerald-300/40 dark:border-emerald-700/40 bg-emerald-50/60 dark:bg-emerald-900/20 p-4">
-              <div className="text-sm opacity-70">Predicted Condition</div>
-              <div className="mt-1 font-semibold">{result.condition}</div>
+          <div className="mt-3 space-y-4">
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="rounded-xl border border-emerald-300/40 dark:border-emerald-700/40 bg-emerald-50/60 dark:bg-emerald-900/20 p-4">
+                <div className="text-sm opacity-70">Predicted Condition</div>
+                <div className="mt-1 font-semibold">{result.condition}</div>
+              </div>
+              <div className="rounded-xl border border-amber-300/40 dark:border-amber-700/40 bg-amber-50/60 dark:bg-amber-900/20 p-4">
+                <div className="text-sm opacity-70">Urgency Level</div>
+                <div className="mt-1 font-semibold">{result.urgency}</div>
+              </div>
             </div>
-            <div className="rounded-xl border border-amber-300/40 dark:border-amber-700/40 bg-amber-50/60 dark:bg-amber-900/20 p-4">
-              <div className="text-sm opacity-70">Urgency Level</div>
-              <div className="mt-1 font-semibold">{result.urgency}</div>
-            </div>
+            {result.user && (
+              <div className="rounded-xl border border-blue-300/40 dark:border-blue-700/40 bg-blue-50/60 dark:bg-blue-900/20 p-4">
+                <div className="text-sm opacity-70">Analyzed for user</div>
+                <div className="mt-1 font-semibold">{result.user.email}</div>
+              </div>
+            )}
           </div>
         ) : (
-          <p className="mt-2 text-sm opacity-70">Run an analysis to see example results.</p>
+          <p className="mt-2 text-sm opacity-70">Run an analysis to see results.</p>
         )}
       </motion.div>
     </div>
   );
 }
-
-

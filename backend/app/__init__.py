@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from .config import Config
+from .firebase_auth import initialize_firebase
 
 
 def create_app(config_class: type = Config) -> Flask:
@@ -12,6 +13,8 @@ def create_app(config_class: type = Config) -> Flask:
         resources={r"/api/*": {"origins": "*"}},
         supports_credentials=True,
     )
+
+    initialize_firebase()
 
     from .routes.auth import bp as auth_bp
     from .routes.uploads import bp as uploads_bp
