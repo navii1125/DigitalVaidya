@@ -6,7 +6,8 @@ class Config:
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB upload limit
     UPLOAD_FOLDER = os.environ.get("UPLOAD_FOLDER", os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads")))
     CORS_ORIGINS = [
-        os.environ.get("FRONTEND_ORIGIN", "http://localhost:5173"),
+        os.environ.get("FRONTEND_ORIGIN", "http://localhost:5000"),
+        "*",
     ]
 
     @staticmethod

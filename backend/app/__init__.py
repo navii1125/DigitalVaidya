@@ -9,7 +9,7 @@ def create_app(config_class: type = Config) -> Flask:
 
     CORS(
         app,
-        resources={r"/api/*": {"origins": app.config.get("CORS_ORIGINS", ["http://localhost:5173"])}} ,
+        resources={r"/api/*": {"origins": "*"}},
         supports_credentials=True,
     )
 
