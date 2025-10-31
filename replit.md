@@ -27,6 +27,24 @@ DigitalVaidya is an AI-powered symptom analysis web application with secure mult
 - Added error handling and loading states for all auth operations
 - Configured API key via Replit Secrets (GOOGLE_API_KEY)
 
+### Backend Firebase Authentication
+- Installed Firebase Admin SDK (firebase-admin==7.1.0)
+- Created authentication middleware (`backend/app/firebase_auth.py`)
+- Implemented `@verify_token` decorator for protected routes
+- Implemented `@optional_auth` decorator for user-aware routes
+- Updated analyze, feedback, and contact endpoints to track authenticated users
+- Backend now extracts user info from Firebase ID tokens
+
+### Enhanced Health Parameters in Demo
+- Added comprehensive health parameter inputs in Demo section
+- Body Temperature (°C)
+- Blood Pressure (Systolic/Diastolic)
+- Heart Rate (bpm)
+- Oxygen Saturation (%)
+- Backend AI analysis now processes health parameters
+- Smart condition detection based on vital signs
+- Real-time API integration with authenticated user tracking
+
 ## Project Architecture
 
 ### Frontend (React + Vite)
@@ -49,29 +67,41 @@ DigitalVaidya is an AI-powered symptom analysis web application with secure mult
   - Flask 3.0.3
   - Flask-CORS 4.0.1
   - Werkzeug 3.0.4
+  - Firebase Admin SDK 7.1.0
 
 ### Features
-- **Firebase Authentication**:
+- **Firebase Authentication** (Frontend + Backend):
   - Google Sign-In (OAuth)
   - Email/Password authentication
   - Real-time authentication state management
   - Secure credential storage via Replit Secrets
+  - Backend token verification with Firebase Admin SDK
+  - User tracking across all API endpoints
+- **Health Parameters Analysis**:
+  - Body Temperature monitoring
+  - Blood Pressure (Systolic/Diastolic) tracking
+  - Heart Rate monitoring
+  - Oxygen Saturation measurement
+  - AI-powered condition detection based on vital signs
+  - Personalized analysis for authenticated users
 - Multi-modal authentication (Face Recognition, Aadhaar) - UI ready
-- AI symptom analysis
+- AI symptom analysis with voice input
 - Multilingual support
 - Dark mode toggle
 - Contact and feedback forms
 - Responsive design with Tailwind CSS
 
 ### API Endpoints
-- `GET /api/health` - Health check
-- `POST /api/auth/login` - Email login
-- `POST /api/auth/signup` - User signup
-- `POST /api/auth/face-login` - Face recognition login
-- `POST /api/uploads/aadhaar` - Aadhaar document upload
-- `POST /api/forms/feedback` - Submit feedback
-- `POST /api/forms/contact` - Contact form submission
-- `POST /api/analyze` - Symptom analysis
+- `GET /api/health` - Health check (public)
+- `POST /api/auth/login` - Email login (public)
+- `POST /api/auth/signup` - User signup (public)
+- `POST /api/auth/face-login` - Face recognition login (public)
+- `POST /api/uploads/aadhaar` - Aadhaar document upload (public)
+- `POST /api/forms/feedback` - Submit feedback (optional auth)
+- `POST /api/forms/contact` - Contact form submission (optional auth)
+- `POST /api/analyze` - Symptom & health parameter analysis (optional auth)
+  - Accepts: description, healthParams (temperature, systolicBP, diastolicBP, heartRate, oxygenLevel)
+  - Returns: condition, urgency, user info (if authenticated)
 
 ## Running the Application
 
