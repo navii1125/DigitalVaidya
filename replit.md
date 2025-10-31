@@ -9,6 +9,7 @@ DigitalVaidya is an AI-powered symptom analysis web application with secure mult
 - All dependencies installed
 
 ## Recent Changes (October 31, 2025)
+### Initial Setup
 - Configured Vite to run on 0.0.0.0:5000 for Replit webview
 - Updated HMR settings for WSS protocol support
 - Changed backend from port 5000 to 8000 (localhost)
@@ -16,6 +17,15 @@ DigitalVaidya is an AI-powered symptom analysis web application with secure mult
 - Installed Python 3.11 and Flask dependencies
 - Fixed node_modules binary permissions
 - Created .gitignore for Python and Node.js
+
+### Firebase Authentication Integration
+- Created Firebase configuration file (`src/config/firebase.js`)
+- Built comprehensive authentication service (`src/services/authService.js`)
+- Updated AuthContext to use Firebase Auth with real-time state management
+- Integrated Google Sign-In functionality in LoginOptions
+- Updated EmailLogin component with proper Firebase email/password authentication
+- Added error handling and loading states for all auth operations
+- Configured API key via Replit Secrets (GOOGLE_API_KEY)
 
 ## Project Architecture
 
@@ -29,6 +39,7 @@ DigitalVaidya is an AI-powered symptom analysis web application with secure mult
   - React Router DOM 6.26.2
   - Framer Motion 11.2.6
   - Tailwind CSS 3.4.15
+  - Firebase 11.x (Authentication)
 
 ### Backend (Flask)
 - **Location**: `/backend`
@@ -40,7 +51,12 @@ DigitalVaidya is an AI-powered symptom analysis web application with secure mult
   - Werkzeug 3.0.4
 
 ### Features
-- Multi-modal authentication (Email, Face Recognition, Aadhaar)
+- **Firebase Authentication**:
+  - Google Sign-In (OAuth)
+  - Email/Password authentication
+  - Real-time authentication state management
+  - Secure credential storage via Replit Secrets
+- Multi-modal authentication (Face Recognition, Aadhaar) - UI ready
 - AI symptom analysis
 - Multilingual support
 - Dark mode toggle
@@ -75,6 +91,18 @@ python wsgi.py
 - **Vite Config**: Configured for Replit with host 0.0.0.0, port 5000, and WSS HMR
 - **CORS**: Enabled for all origins to work with Replit's proxy
 - **Upload Directory**: `backend/uploads` (created automatically)
+- **Firebase Config**: 
+  - Project: gen-lang-client-0305521767
+  - Auth Domain: gen-lang-client-0305521767.firebaseapp.com
+  - API Key: Stored securely in Replit Secrets (GOOGLE_API_KEY)
+  - Providers enabled: Email/Password, Google OAuth
+
+### Authentication Service Files
+- `src/config/firebase.js` - Firebase initialization and configuration
+- `src/services/authService.js` - Auth methods (signUp, signIn, signOut, Google auth, password reset)
+- `src/context/AuthContext.jsx` - React context with Firebase auth state management
+- `src/login/EmailLogin.jsx` - Email/password authentication UI
+- `src/login/LoginOptions.jsx` - Login method selection with Google Sign-In
 
 ## User Preferences
 None specified yet.
